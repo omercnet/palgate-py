@@ -49,6 +49,7 @@ class PalGate:
         self.System.loadLibrary("log")
         self.System.loadLibrary("dl")
         self.System.loadLibrary("c")
+        self.System.loadLibrary("m")
         self.FaceDetectNative = JClass("com.bluegate.shared.FaceDetectNative")
 
         self.config = Config()
