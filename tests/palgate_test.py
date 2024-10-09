@@ -12,7 +12,7 @@ def palgate_instance():
     """Sets up a palgate for the session that can be reused.
     We need it scoped to session so we reuse the JVM and avoid starting it multiple times."""
 
-    return PalGate()
+    yield PalGate()
 
 
 @pytest.fixture
@@ -23,7 +23,7 @@ def palgate(palgate_instance):
     palgate_instance.config.user = User(
         id="123", token="abcdef", firstname="John", lastname="Doe", image=False
     )
-    return palgate_instance
+    yield palgate_instance
 
 
 def test_api(mocker: MockerFixture, palgate):
