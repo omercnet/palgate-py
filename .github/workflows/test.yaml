@@ -15,8 +15,8 @@ env:
   FORCE_COLOR: "1"
 
 jobs:
-  fmt:
-    name: Format code
+  build:
+    name: Initial checks
     runs-on: ubuntu-latest
 
     steps:
@@ -31,18 +31,21 @@ jobs:
     - name: Install Hatch
       run: pip install --upgrade hatch
 
-    - name: Run static analysis
+    - name: Static analysis
       run: hatch fmt --check
-  
-  run:
+
+    - name: Build
+      run: hatch build
+
+  test:
     name: Python ${{ matrix.python-version }} on ${{ startsWith(matrix.os, 'macos-') && 'macOS' || startsWith(matrix.os, 'windows-') && 'Windows' || 'Linux' }}
     runs-on: ${{ matrix.os }}
-    needs: fmt
+    needs: build
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.9', '3.10', '3.11', '3.12']
 
     steps:
     - uses: actions/checkout@v4
