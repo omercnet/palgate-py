@@ -12,9 +12,8 @@ env:
   FORCE_COLOR: "1"
 
 jobs:
-  deploy:
+  release:
     runs-on: ubuntu-latest
-    environment: release
     permissions:
       id-token: write
     steps:
@@ -24,6 +23,10 @@ jobs:
       with:
         python-version: 3.x
         cache: pip
+    - uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version-file: '.java-version'
     - name: Install dependencies
       run: pip install --upgrade hatch
     - name: Build package
