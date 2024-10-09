@@ -1,0 +1,80 @@
+[build-system]
+requires = ["hatchling", "hatch-build-scripts"]
+build-backend = "hatchling.build"
+
+[project]
+name = "palgate-py"
+dynamic = ["version"]
+description = ''
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "omercnet", email = "639682+omercnet@users.noreply.github.com" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = ["click", "JPype1"]
+
+[project.urls]
+Documentation = "https://github.com/omercnet/palgate-py#readme"
+Issues = "https://github.com/omercnet/palgate-py/issues"
+Source = "https://github.com/omercnet/palgate-py"
+
+[project.scripts]
+palgate-py = "palgate_py.cli:palgate_py"
+
+[tool.hatch.version]
+path = "src/palgate_py/__about__.py"
+
+[tool.hatch.envs.types]
+extra-dependencies = ["mypy>=1.0.0"]
+
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/palgate_py tests}"
+
+[tool.coverage.run]
+source_pkgs = ["palgate_py", "tests"]
+branch = true
+parallel = true
+omit = ["src/palgate_py/__about__.py"]
+
+[tool.coverage.paths]
+palgate_py = ["src/palgate_py", "*/palgate-py/src/palgate_py"]
+tests = ["tests", "*/palgate-py/tests"]
+
+[tool.coverage.report]
+exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
+
+[tool.ruff]
+line-length = 88
+fix = true
+
+[[tool.hatch.build.hooks.build-scripts.scripts]]
+commands = [
+  "javac -d build/java ./src/java/com/bluegate/shared/*.java",
+  "jar cf src/palgate_py/palgate/lib/palgate.jar -C build/java .",
+]
+artifacts = ["palgate-py.jar"]
+
+[tool.hatch.build]
+skip-excluded-dirs = true
+artifacts = ["*.so", "*.jar"]
+only-packages = true
+only-include = ["src/palgate_py"]
+exclude = [".java"]
+sources = ["src"]
+
+
+[tool.hatch.envs.hatch-test]
+extra-dependencies = ["pytest-mock"]
