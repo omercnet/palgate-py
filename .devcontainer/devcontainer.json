@@ -1,0 +1,35 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/python
+{
+	"name": "Python 3",
+	// "build": { "args": {"platform": "linux/amd64"} },
+	"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+	"features": {
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"configureZshAsDefaultShell": true
+		},
+		"ghcr.io/devcontainers/features/java:1": {
+			"version": 17,
+			"jdkDistro": "open"
+		},
+		"ghcr.io/devcontainers/features/python:1": {
+			"enableShared": true,
+			"toolsToInstall": "hatch"
+		},
+		"ghcr.io/devcontainers/features/git:1": {}
+	},
+	"postCreateCommand": "hatch env create",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"charliermarsh.ruff",
+				"github.vscode-github-actions",
+				"redhat.java",
+				"GitHub.copilot",
+				"njpwerner.autodocstring",
+				"tamasfe.even-better-toml",
+				"ms-python.mypy-type-checker"
+			]
+		}
+	}
+}
