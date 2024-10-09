@@ -39,8 +39,8 @@ jobs:
     - name: Static analysis
       run: hatch fmt --check
 
-    - name: Build
-      run: hatch build
+    - name: Build artifacts
+      run: hatch build --ext
     
     - name: Test
       run: hatch test --cover --retries 2 --retry-delay 1 -v -- -v
@@ -70,8 +70,8 @@ jobs:
     - name: Install Hatch
       run: pip install --upgrade hatch
 
-    - name: Build
-      run: hatch build
+    - name: Build artifacts
+      run: hatch build --ext
 
     - name: Run tests
       run: hatch test --python ${{ matrix.python-version }} --cover --retries 2 --retry-delay 1 -v -- -v
