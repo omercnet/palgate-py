@@ -79,6 +79,10 @@ class PalGate:
 
     def qr_url(self) -> str:
         """Generate the QR code URL for the session."""
+
+        if self.config.palgate is None:
+            msg = "Palgate configuration is not set."
+            raise ValueError(msg)
         session = self.config.palgate.get("session")
         return urljoin(self.API_BASE_URL, f"un/secondary/qr/{session}")
 
@@ -94,21 +98,25 @@ class PalGate:
             msg = "Invalid URL: {req.full_url}"
             raise ValueError(msg)
 
-        req = request.Request(
+        req = request.Request(  # noqa: S310
             url,
             headers=headers,
         )
         try:
-            with request.urlopen(req) as res:
+            with request.urlopen(req) as res:  # noqa: S310
                 data = res.read()
         except HTTPError as e:
             data = json.dumps({"status": "error", "msg": str(e)}).encode()
         if self.debug:
-            print("Response", repr(data))
+            pass
         return json.loads(data)
 
     def login(self) -> tuple[bool, Any]:
         """Log in to the PalGate system."""
+
+        if self.config.palgate is None:
+            msg = "Palgate configuration is not set."
+            raise ValueError(msg)
         session = self.config.palgate.get("session")
         try:
             data = self._api(f"un/secondary/init/{session}", auth=False)
@@ -120,20 +128,24 @@ class PalGate:
 
     def is_token_valid(self) -> tuple[bool, str]:
         """Check if the token is valid."""
+
         res = self._api("user/check-token")
         return res.setdefault("status", "error") != "ok", res.get("msg", "")
 
     def list_devices(self) -> list[Device]:
         """List all devices."""
+
         res = self._api("devices")
         return [Device.from_dict(device) for device in res["devices"]]
 
     def open_gate(self, device_id: str) -> tuple[bool, str]:
         """Open a gate."""
+
         res = self._api(f"device/{device_id}/open-gate?openBy=100&outputNum=1")
         return res.setdefault("status", "error") != "ok", res.get("msg", "")
 
     def logout(self):
         """Log out from the PalGate system."""
+
         del self.config.user
         del self.config.palgate

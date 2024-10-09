@@ -12,10 +12,10 @@ def palgate_instance():
     """Sets up a palgate for the session that can be reused.
     We need it scoped to session so we reuse the JVM and avoid starting it multiple times."""
 
-    yield PalGate()
+    return PalGate()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def palgate(palgate_instance):
     """Sets up a palgate instance with a default configuration and user."""
 
@@ -23,7 +23,7 @@ def palgate(palgate_instance):
     palgate_instance.config.user = User(
         id="123", token="abcdef", firstname="John", lastname="Doe", image=False
     )
-    yield palgate_instance
+    return palgate_instance
 
 
 def test_api(mocker: MockerFixture, palgate):
@@ -35,7 +35,7 @@ def test_api(mocker: MockerFixture, palgate):
         mocker.mock_open(read_data=json.dumps({"status": "ok"}).encode()),
     )
 
-    response = palgate._api("test/path")
+    response = palgate._api("test/path")  # noqa: SLF001
     assert response == {"status": "ok"}
 
 
@@ -71,7 +71,7 @@ def test_is_token_valid(mocker: MockerFixture, palgate):
 
 
 def test_list_devices(mocker: MockerFixture, palgate):
-    mock_api = mocker.patch(
+    mocker.patch(
         "palgate_py.palgate.palgate.PalGate._api",
         return_value={"devices": [{"id": "1", "name": "Device1"}]},
     )
@@ -82,7 +82,7 @@ def test_list_devices(mocker: MockerFixture, palgate):
 
 
 def test_open_gate(mocker: MockerFixture, palgate):
-    mock_api = mocker.patch(
+    mocker.patch(
         "palgate_py.palgate.palgate.PalGate._api", return_value={"status": "ok"}
     )
     error, msg = palgate.open_gate("device_id")
