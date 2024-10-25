@@ -25,7 +25,6 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: 3.9
         cache: pip
 
     - uses: actions/setup-java@v4
@@ -41,9 +40,7 @@ jobs:
 
     - name: Build artifacts
       run: hatch build --ext
-    
-    - name: Test
-      run: hatch test --retries 2 --retry-delay 1 -v -- -v
+  
   test:
     name: Python ${{ matrix.python-version }} on ${{ startsWith(matrix.os, 'macos-') && 'macOS' || startsWith(matrix.os, 'windows-') && 'Windows' || 'Linux' }}
     runs-on: ${{ matrix.os }}
