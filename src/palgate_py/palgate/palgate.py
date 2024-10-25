@@ -17,7 +17,7 @@ from urllib.parse import urljoin
 
 import jpype  # type: ignore
 import jpype.imports  # type: ignore
-from jpype.types import JClass, JLong  # type: ignore
+from jpype.types import JClass  # type: ignore
 
 from palgate_py.palgate.config import Config, User
 from palgate_py.palgate.models import Device
@@ -38,44 +38,30 @@ class PalGate:
     def __init__(self) -> None:
         """Initialize the PalGate instance."""
         cwd = Path(__file__).parent
+        lib_path = cwd / "lib" / platform.processor()
+
         jpype.addClassPath(str(cwd / "lib" / "palgate.jar"))
-        jpype.startJVM(
-            "-Djava.library.path=" + str(cwd / "lib" / platform.processor()),
-        )
+        jpype.startJVM(f"-Djava.library.path={lib_path}")
+
         self.debug = os.environ.get("DEBUG", "") != ""
         self.Long = JClass("java.lang.Long")
         self.System = JClass("java.lang.System")
 
-        self.System.loadLibrary("log")
-        self.System.loadLibrary("dl")
-        self.System.loadLibrary("c")
-        self.System.loadLibrary("m")
+        self.System.load(str(lib_path / "liblog.so"))
+        self.System.load(str(lib_path / "libdl.so"))
+        self.System.load(str(lib_path / "libm.so"))
+        self.System.load(str(lib_path / "libc.so"))
         self.FaceDetectNative = JClass("com.bluegate.shared.FaceDetectNative")
 
         self.config = Config()
 
-    @staticmethod
-    def int_to_hex_string(int_arr: list[int]) -> str:
-        """Convert an array of integers to a hexadecimal string."""
-        return "".join(f"{i:02X}" for i in int_arr)
-
-    @staticmethod
-    def hex_string_to_byte_array(hex_string: str) -> bytearray:
-        """Convert a hexadecimal string to a byte array."""
-        return bytearray(
-            int(hex_string[i : i + 2], 16) for i in range(0, len(hex_string), 2)
-        )
-
     def _get_token(self) -> str:
-        ts = JLong(JLong(1) + self.System.currentTimeMillis() / 1000)
         if self.config.user is None:
             msg = "User configuration is not set."
             raise ValueError(msg)
-        user_id = self.Long().parseLong(self.config.user.id)
-        token = PalGate.hex_string_to_byte_array(self.config.user.token)
 
-        return PalGate.int_to_hex_string(
-            self.FaceDetectNative.getFacialLandmarks(token, ts, user_id, 1),
+        return str(
+            self.FaceDetectNative.getToken(self.config.user.token, self.config.user.id)
         )
 
     def qr_url(self) -> str:
@@ -108,8 +94,6 @@ class PalGate:
                 data = res.read()
         except HTTPError as e:
             data = json.dumps({"status": "error", "msg": str(e)}).encode()
-        if self.debug:
-            pass
         return json.loads(data)
 
     def login(self) -> tuple[bool, Any]:

@@ -24,12 +24,14 @@ def login_error() -> None:
 @click.version_option(version=__version__, prog_name="Palgate-PY")
 def palgate_py() -> None:
     """Provide the main command group for the PalGate CLI."""
+    if click.get_current_context().invoked_subcommand == "logout":
+        return
     if client.config.user:
         err, msg = client.is_token_valid()
         if err:
-            click.exceptions.UsageError("Token is invalid!")
-        else:
-            click.secho(msg, fg="green")
+            click.secho(f"Error: {msg}", fg="red")
+            raise click.exceptions.Exit
+        click.secho(msg, fg="green")
     else:
         click.secho(
             "Link a new device with your palgate app (https://www.youtube.com/watch?v=LRuezZ1jw9Q)"
