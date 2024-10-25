@@ -40,9 +40,13 @@ jobs:
 
     - name: Build artifacts
       run: hatch build --ext
+<<<<<<< HEAD
     
     - name: Test
       run: hatch test --cover --retries 2 --retry-delay 1 -v
+=======
+  
+>>>>>>> a1ba231 (fix)
   test:
     name: Python ${{ matrix.python-version }} on ${{ startsWith(matrix.os, 'macos-') && 'macOS' || startsWith(matrix.os, 'windows-') && 'Windows' || 'Linux' }}
     runs-on: ${{ matrix.os }}
