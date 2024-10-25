@@ -62,7 +62,6 @@ fix = true
 [[tool.hatch.build.hooks.build-scripts.scripts]]
 commands = [
   "javac -d build/java ./src/java/com/bluegate/shared/*.java",
-  "rm -rf src/palgate_py/palgate/lib/palgate.jar || true",
   "jar cf src/palgate_py/palgate/lib/palgate.jar -C build/java .",
 ]
 artifacts = []
