@@ -43,7 +43,7 @@ jobs:
       run: hatch build --ext
     
     - name: Test
-      run: hatch test --cover --retries 2 --retry-delay 1 -v -- -v
+      run: hatch test --retries 2 --retry-delay 1 -v -- -v
   test:
     name: Python ${{ matrix.python-version }} on ${{ startsWith(matrix.os, 'macos-') && 'macOS' || startsWith(matrix.os, 'windows-') && 'Windows' || 'Linux' }}
     runs-on: ${{ matrix.os }}
