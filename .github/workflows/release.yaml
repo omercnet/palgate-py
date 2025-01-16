@@ -23,10 +23,6 @@ jobs:
       with:
         python-version: 3.x
         cache: pip
-    - uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version-file: '.java-version'
     - name: Install dependencies
       run: pip install --upgrade hatch
     - name: Build package

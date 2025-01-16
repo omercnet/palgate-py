@@ -7,11 +7,10 @@
 from __future__ import annotations
 
 import configparser
-import os
 from pathlib import Path
 from uuid import uuid4
 
-from palgate_py.palgate.models import User
+from palgate_py.palgate.models import Palgate, User
 
 
 class Config:
@@ -22,15 +21,7 @@ class Config:
 
     def __init__(self) -> None:
         """Initialize the Config object."""
-        # Determine the appropriate config directory based on the operating system
-        if os.name == "nt":  # Windows
-            appdata = os.getenv("APPDATA")
-            if appdata is None:
-                msg = "APPDATA environment variable is not set."
-                raise ValueError(msg)
-            config_dir = Path(appdata) / "palgate"
-        else:  # Linux and macOS
-            config_dir = Path.home() / ".config" / "palgate"
+        config_dir = Path.home() / ".config" / "palgate"
 
         # Create the directory if it doesn't exist
         config_dir.mkdir(parents=True, exist_ok=True)
@@ -44,17 +35,17 @@ class Config:
 
         # Set a value
         if "palgate" not in self._config:
-            self._config["palgate"] = {"session": str(uuid4())}
+            self._config["palgate"] = Palgate(session=str(uuid4()))._asdict()
 
         if "palgate.user" not in self._config:
             self._config["palgate.user"] = {}
 
     @property
-    def palgate(self) -> configparser.SectionProxy | None:
+    def palgate(self) -> Palgate | None:
         """Return the 'palgate' section of the configuration."""
         try:
-            return self._config["palgate"]
-        except KeyError:
+            return Palgate(**self._config["palgate"])
+        except (KeyError, TypeError):
             return None
 
     @palgate.setter

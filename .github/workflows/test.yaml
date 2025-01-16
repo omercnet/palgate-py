@@ -25,13 +25,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: 3.9
         cache: pip
-
-    - uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version-file: '.java-version'
 
     - name: Install Hatch
       run: pip install --upgrade hatch
@@ -41,17 +35,14 @@ jobs:
 
     - name: Build artifacts
       run: hatch build --ext
-    
-    - name: Test
-      run: hatch test --cover --retries 2 --retry-delay 1 -v -- -v
+      
   test:
-    name: Python ${{ matrix.python-version }} on ${{ startsWith(matrix.os, 'macos-') && 'macOS' || startsWith(matrix.os, 'windows-') && 'Windows' || 'Linux' }}
-    runs-on: ${{ matrix.os }}
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
     needs: build
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ['3.9', '3.10', '3.11', '3.12']
 
     steps:
@@ -62,11 +53,6 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     
-    - uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version-file: '.java-version'
-
     - name: Install Hatch
       run: pip install --upgrade hatch
 
