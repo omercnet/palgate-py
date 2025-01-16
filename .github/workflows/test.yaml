@@ -27,11 +27,6 @@ jobs:
       with:
         cache: pip
 
-    - uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version-file: '.java-version'
-
     - name: Install Hatch
       run: pip install --upgrade hatch
 
@@ -58,11 +53,6 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     
-    - uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version-file: '.java-version'
-
     - name: Install Hatch
       run: pip install --upgrade hatch
 
