@@ -181,3 +181,5 @@ hs_err_pid*
 replay_pid*
 
 *.jar
+
+.DS_Store

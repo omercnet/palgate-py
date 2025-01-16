@@ -23,7 +23,7 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = ["click", "JPype1"]
+dependencies = ["click"]
 
 [project.urls]
 Documentation = "https://github.com/omercnet/palgate-py#readme"
@@ -31,7 +31,7 @@ Issues = "https://github.com/omercnet/palgate-py/issues"
 Source = "https://github.com/omercnet/palgate-py"
 
 [project.scripts]
-palgate-py = "palgate_py.cli:palgate_py"
+palgate-py = "palgate_py.cli:cli"
 
 [tool.hatch.version]
 path = "src/palgate_py/__about__.py"
@@ -59,19 +59,11 @@ exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
 line-length = 88
 fix = true
 
-[[tool.hatch.build.hooks.build-scripts.scripts]]
-commands = [
-  "javac -d build/java ./src/java/com/bluegate/shared/*.java",
-  "jar cf src/palgate_py/palgate/lib/palgate.jar -C build/java .",
-]
-artifacts = []
 
 [tool.hatch.build]
 skip-excluded-dirs = true
-artifacts = ["*.so", "*.jar"]
 only-packages = true
 only-include = ["src/palgate_py"]
-exclude = [".java"]
 sources = ["src"]
 
 

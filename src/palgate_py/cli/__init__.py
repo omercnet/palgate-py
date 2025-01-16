@@ -4,6 +4,6 @@
 
 """Cli module provides the command-line interface for the palgate_py package."""
 
-from palgate_py.cli.cli import palgate_py
+from palgate_py.cli.cli import cli
 
-__all__ = ["palgate_py"]
+__all__ = ["cli"]

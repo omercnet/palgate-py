@@ -3,4 +3,4 @@
 # SPDX-License-Identifier: MIT
 """Provides metadata about the palgate_py package."""
 
-__version__ = "0.0.1"
+__version__ = "0.0.3"

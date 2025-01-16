@@ -7,6 +7,6 @@
 import sys
 
 if __name__ == "__main__":
-    from palgate_py.cli import palgate_py
+    from .cli import cli
 
-    sys.exit(palgate_py())
+    sys.exit(cli())

@@ -70,3 +70,11 @@ class User(NamedTuple):
     firstname: str
     lastname: str
     image: bool
+
+
+class Palgate(NamedTuple):
+    session: str
+
+
+class Token(NamedTuple):
+    token: str

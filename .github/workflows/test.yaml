@@ -40,18 +40,14 @@ jobs:
 
     - name: Build artifacts
       run: hatch build --ext
-    
-    - name: Test
-      run: hatch test --cover --retries 2 --retry-delay 1 -v
-  
+      
   test:
-    name: Python ${{ matrix.python-version }} on ${{ startsWith(matrix.os, 'macos-') && 'macOS' || startsWith(matrix.os, 'windows-') && 'Windows' || 'Linux' }}
-    runs-on: ${{ matrix.os }}
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
     needs: build
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ['3.9', '3.10', '3.11', '3.12']
 
     steps:

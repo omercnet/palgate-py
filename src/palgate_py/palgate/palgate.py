@@ -8,16 +8,10 @@ from __future__ import annotations
 
 import json
 import os
-import platform
-from pathlib import Path
 from typing import Any
 from urllib import request
 from urllib.error import HTTPError
 from urllib.parse import urljoin
-
-import jpype  # type: ignore
-import jpype.imports  # type: ignore
-from jpype.types import JClass  # type: ignore
 
 from palgate_py.palgate.config import Config, User
 from palgate_py.palgate.models import Device
@@ -26,32 +20,16 @@ from palgate_py.palgate.models import Device
 class PalGate:
     """PalGate class provides an interface to interact with the PalGate system."""
 
-    FaceDetectionNative: JClass
-    Long: JClass
-    System: JClass
-
     config: Config
     debug: bool
 
     API_BASE_URL = "https://api1.pal-es.com/v1/bt/"
+    PALTOK_URL = "https://ks6freh52utfwzduwxrgkmqfcy0ykyuu.lambda-url.us-east-1.on.aws/"
 
     def __init__(self) -> None:
         """Initialize the PalGate instance."""
-        cwd = Path(__file__).parent
-        lib_path = cwd / "lib" / platform.processor()
-
-        jpype.addClassPath(str(cwd / "lib" / "palgate.jar"))
-        jpype.startJVM(f"-Djava.library.path={lib_path}")
 
         self.debug = os.environ.get("DEBUG", "") != ""
-        self.Long = JClass("java.lang.Long")
-        self.System = JClass("java.lang.System")
-
-        self.System.load(str(lib_path / "liblog.so"))
-        self.System.load(str(lib_path / "libdl.so"))
-        self.System.load(str(lib_path / "libm.so"))
-        self.System.load(str(lib_path / "libc.so"))
-        self.FaceDetectNative = JClass("com.bluegate.shared.FaceDetectNative")
 
         self.config = Config()
 
@@ -60,9 +38,28 @@ class PalGate:
             msg = "User configuration is not set."
             raise ValueError(msg)
 
-        return str(
-            self.FaceDetectNative.getToken(self.config.user.token, self.config.user.id)
+        url = self.PALTOK_URL
+
+        req = request.Request(
+            url,
+            method="POST",
+            headers={"Content-Type": "application/json"},
+            data=json.dumps(
+                {
+                    "UserId": self.config.user.id,
+                    "SessionToken": self.config.user.token,
+                }
+            ).encode(),
         )
+
+        try:
+            with request.urlopen(req) as res:
+                data = res.read()
+        except HTTPError as e:
+            data = json.dumps({"status": "error", "msg": str(e)}).encode()
+        token = json.loads(data).get("token", "")
+
+        return token
 
     def qr_url(self) -> str:
         """Generate the QR code URL for the session."""
@@ -70,7 +67,7 @@ class PalGate:
         if self.config.palgate is None:
             msg = "Palgate configuration is not set."
             raise ValueError(msg)
-        session = self.config.palgate.get("session")
+        session = self.config.palgate.session
         return urljoin(self.API_BASE_URL, f"un/secondary/qr/{session}")
 
     def _api(self, path: str, *, auth: bool = True) -> dict:
@@ -81,14 +78,15 @@ class PalGate:
         if self.debug:
             pass
 
-        if not url.startswith("https:"):
-            msg = "Invalid URL: {req.full_url}"
-            raise ValueError(msg)
-
         req = request.Request(  # noqa: S310
             url,
             headers=headers,
         )
+
+        if not url.startswith("https:"):
+            msg = "Invalid URL: {req.full_url}"
+            raise ValueError(msg)
+
         try:
             with request.urlopen(req) as res:  # noqa: S310
                 data = res.read()
@@ -102,7 +100,7 @@ class PalGate:
         if self.config.palgate is None:
             msg = "Palgate configuration is not set."
             raise ValueError(msg)
-        session = self.config.palgate.get("session")
+        session = self.config.palgate.session
         try:
             data = self._api(f"un/secondary/init/{session}", auth=False)
             user = User(**data["user"])
