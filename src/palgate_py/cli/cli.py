@@ -70,7 +70,7 @@ def list_devices(ctx) -> None:
 @cli.command()
 @click.argument("device_id")
 @click.pass_context
-def open_gate(ctx, device_id: str) -> None:
+def open_gate(device_id: str) -> None:
     """Open the gate for the specified device ID."""
     err, msg = client.open_gate(device_id)
     if err:

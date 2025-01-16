@@ -24,7 +24,6 @@ class PalGate:
     debug: bool
 
     API_BASE_URL = "https://api1.pal-es.com/v1/bt/"
-    PALTOK_URL = "https://ks6freh52utfwzduwxrgkmqfcy0ykyuu.lambda-url.us-east-1.on.aws/"
 
     def __init__(self) -> None:
         """Initialize the PalGate instance."""
@@ -38,28 +37,23 @@ class PalGate:
             msg = "User configuration is not set."
             raise ValueError(msg)
 
-        url = self.PALTOK_URL
-
-        req = request.Request(
-            url,
-            method="POST",
-            headers={"Content-Type": "application/json"},
-            data=json.dumps(
-                {
-                    "UserId": self.config.user.id,
-                    "SessionToken": self.config.user.token,
-                }
-            ).encode(),
-        )
-
         try:
-            with request.urlopen(req) as res:
+            req = request.Request(
+                "https://ks6freh52utfwzduwxrgkmqfcy0ykyuu.lambda-url.us-east-1.on.aws/",
+                method="POST",
+                headers={"Content-Type": "application/json"},
+                data=json.dumps(
+                    {
+                        "UserId": self.config.user.id,
+                        "SessionToken": self.config.user.token,
+                    }
+                ).encode(),
+            )
+            with request.urlopen(req) as res:  # noqa: S310
                 data = res.read()
         except HTTPError as e:
             data = json.dumps({"status": "error", "msg": str(e)}).encode()
-        token = json.loads(data).get("token", "")
-
-        return token
+        return json.loads(data).get("token", "")
 
     def qr_url(self) -> str:
         """Generate the QR code URL for the session."""

@@ -90,16 +90,16 @@ def test_get_token_success(mocker: MockerFixture, palgate):
         mocker.mock_open(read_data=mock_response),
     )
 
-    token = palgate._get_token()
+    token = palgate._get_token()  # noqa: SLF001
     assert token == "test_token"
 
 
 def test_get_token_no_user_config(palgate):
     del palgate.config.user
     with pytest.raises(ValueError, match="User configuration is not set."):
-        palgate._get_token()
+        palgate._get_token()  # noqa: SLF001
 
 
 def test_get_token(palgate):
-    token = palgate._get_token()
+    token = palgate._get_token()  # noqa: SLF001
     assert token is not None

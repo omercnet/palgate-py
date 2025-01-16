@@ -7,6 +7,6 @@
 import sys
 
 if __name__ == "__main__":
-    from .cli import cli
+    from palgate_py.cli import cli
 
     sys.exit(cli())
